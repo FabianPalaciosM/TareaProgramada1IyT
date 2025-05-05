@@ -1,7 +1,4 @@
-lista_lineas= []
-with open("estudiantes.txt", 'r', encoding="utf-8")as archivo:
-    lista_lineas = [linea.strip() for linea in archivo]
-
+import Funciones
 def menu():
     BDCreada=False
     while True:
@@ -20,11 +17,15 @@ def menu():
         menu = input("Seleccione la opción que desea: ")
 
         if menu == "1":
-
             if BDCreada==True:
                 print ("Ya existe la base de datos.")
             else:
                 BDCreada=True
+        elif menu=="2":
+            if BDCreada==False:
+                print("La base de datos no está creada")
+            elif BDCreada== True:
+                print("Ya está creada")
         elif menu == "11":
             print("Gracias por usar el programa") 
             break
