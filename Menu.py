@@ -1,4 +1,5 @@
 import Funciones
+
 def menu():
     BDCreada=False
     while True:
@@ -24,6 +25,7 @@ def menu():
         elif menu=="2":
             if BDCreada==False:
                 print("La base de datos no está creada")
+                return menu()
             elif BDCreada== True:
                 print("Ya está creada")
         elif menu == "11":
