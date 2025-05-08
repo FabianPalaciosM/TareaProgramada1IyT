@@ -1,0 +1,11 @@
+José,Martínez,Vargas,Masculino
+Carlos,Torres,Rojas,Femenino
+Camila,Flores,Díaz,Masculino
+Laura,Ramírez,Flores,Masculino
+Laura,Mora,Navarro,Femenino
+Carlos,Solano,Rodríguez,Masculino
+Miguel,Chaves,Gómez,Masculino
+Carlos,Morales,Martínez,Masculino
+Luis,Castro,Díaz,Masculino
+Daniel,Flores,Navarro,Femenino
+Valeria,Torres,Sánchez,Masculino
