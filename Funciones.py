@@ -38,29 +38,48 @@ def generarNombre():
 
 #Carnet
 def crearCarnet(annoInicial, annoFinal):
-    sedes = []
-    with open('sedes.txt', 'r') as archivo:
-        for linea in archivo:
-            sedes.append(linea.rstrip('\n')) #Lee linea por linea y lo añade a la lista vacia
+    """
+    Genera un carnet de estudiante con el formato Año/Sede/Numero aleatorio, validado con una expresión regular.
 
-    codigoSede = random.randint(1, len(sedes))  # Genera un código entre 1 y la cantidad de sedes en el archivo
+    - AAAA: Año de ingreso aleatorio entre annoInicial y annoFinal.
+    - SS: Código de sede de 2 dígitos (01, 02, ..., 10, ...).
+    - NNNN: Número aleatorio de 4 dígitos.
+
+    Devuelve:
+    - carnet (int): Número de carnet si cumple el formato esperado.
+    """
+    sedes = []
+    with open('sedes.txt', 'r', encoding='utf-8') as archivo:
+        for linea in archivo:
+            sedes.append(linea.rstrip('\n'))
+
+    codigoSede = random.randint(1, len(sedes))  # Número entre 1 y total de sedes
     inicioCarnet = random.randint(annoInicial, annoFinal)
-    if len(sedes)<10:
-        codigoSede = "0"+str(codigoSede)
+    if len(sedes) < 10:
+        codigoSede = "0" + str(codigoSede)
     else:
-        codigoSede = str(codigoSede)
+        codigoSede = str(codigoSede).zfill(2)
     finalCarnet = random.randint(1000, 9999)
-    carnet = int(str(inicioCarnet)+str(codigoSede)+ str(finalCarnet))  #Los une 
-    return carnet
+
+    carnetStr = f"{inicioCarnet}{codigoSede}{finalCarnet}"
+
+    if re.fullmatch(r"\d{10}", carnetStr):
+        return int(carnetStr)
+    else:
+        raise ValueError("El carnet generado no cumple con el formato esperado.")
 
 #Correo
 def generarCorreo(nombre, apellido1):
+    patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" #Solo acepta letras, acepta caracteres especiales
 
-    letraInicial = nombre[0].lower() # Genera el correo
-    apellidoCorreo = apellido1.lower()
-   
-    numeros = random.randint(1000, 9999)
-    correo = letraInicial+ apellidoCorreo + str(numeros)+ "@estudiantec.cr" #Crea el correo
+    if not re.fullmatch(patron, nombre) or not re.fullmatch(patron, apellido1): #Revisa que el nombre y apellido tengan el patron esperado
+        raise ValueError("El nombre y el primer apellido deben contener solo letras sin espacios ni caracteres especiales.")
+
+    inicial = nombre[0].lower()
+    apellidoAUsar = apellido1.lower()
+    numeros = str(random.randint(1000, 9999))
+
+    correo = f"{inicial}{apellidoAUsar}{numeros}@estudiantec.cr" #Genera el correo
     return correo
 
 #Cuanto vale cada nota
@@ -91,16 +110,14 @@ def notasRandom(porcentaje1, porcentaje2, porcentaje3):
     notas = ((nota1, nota2, nota3, nota4, nota5))
     return notas
 
-#def ordenarPorGenero(listatotal):
-
 def crearBaseEs():
     baseLista = []
     try:
         cantidad = int(input("Digite la cantidad de estudiantes: "))
         porcentaje = int(input("Ingrese qué porcentaje de estos estudiantes desea ingresar a la base de datos: %"))
         annoInicial = int(input("Digite el año inicial de entra de dichos estudiantes: "))
-        annoFinal = int(input("Digite el año limite de entrada de dichos estudiantes: "))
-        porcentajesAUsar = porcentajesNotas()
+        annoFinal = int(input("Digite el año limite de entrada de dichos estudiantes: ")) 
+        porcentajesAUsar = porcentajesNotas() #Pide los inputs de todo
         if annoInicial > annoFinal:
             print("El año inicial de entrada debe ser menor o igual a año limite de entrada.")
             return crearBaseEs()
@@ -124,15 +141,15 @@ def crearBaseEs():
         return baseFinal
     except ValueError:
         print("Por favor ingrese valores validos.")
-        return crearBaseEs()
+        return crearBaseEs() #Si algo esta mal ingresado llama de nuevo a la funcion
 
 #Crea su parte de la base con Names
 def crearBaseNames(cantidad, porcentaje, annoInicial, annoFinal, porcentajesAUsar):
     cantidadAGenerar = int((porcentaje / 100) * cantidad)
     listaCarnets = []
-    listaCorreos = []
-    baseDatos = []
-    for i in range(cantidadAGenerar):
+    listaCorreos = [] 
+    baseDatos = [] #Establezco las 3 listas necesarias
+    for i in range(cantidadAGenerar): #Ejecuta el codigo la cantidad de veces que pueda con range(cantidadAGenerar)
         nombreYGenero = generarNombre()
         nombre = (nombreYGenero[0], nombreYGenero[1], nombreYGenero[2]) 
         genero = nombreYGenero[3]
@@ -150,7 +167,6 @@ def crearBaseNames(cantidad, porcentaje, annoInicial, annoFinal, porcentajesAUsa
         notas = notasRandom(porcentajesAUsar[0], porcentajesAUsar[1], porcentajesAUsar[2]) #Saca los porcentajes de la tupla porcentajesAUsar
         baseDatos.append([nombre, genero, carnet, correo, notas])
     return baseDatos, listaCarnets, listaCorreos #Devuelve una tupla por las comas
-
 
 #Crea su parte de la base
 def generarListaTXT():
@@ -191,21 +207,64 @@ def crearBaseTXT(carnetsExistentes, correosExistentes, annoInicial, annoFinal, p
         baseTXT.append(estudiante)
     return baseTXT
 
-def generarEstudianteManuaES():
-    nombreManual = str(input(""))
+def generarEstudianteManualES():
+    nombreInput = str(input("Escriba el nombre completo del estudiante por favor: "))
+    generoInput = int(input("Ahora ingrese 1 o 2 para establecer el genero del estudiante. 1 para masculino, 2 para femenino. Digite: "))
+    annoInput = int(input("Ingrese el año de entrada del estudiante"))
+    # sedeInput = str(input("¿En qué sede se encuentra este estudiante? 1. Cartago \n"
+    # "2. San Carlos\n"
+    # "3. San Jose\n"
+    # "4. Alajuela"))
+    partesNombre = nombreInput.strip().split()
+    nombreManual = partesNombre[0]
+    apellido1Manual = partesNombre[1]
+    apellido2Manual = partesNombre[2]
+    print(nombreManual, apellido1Manual, apellido2Manual, generoInput)
+    return generarEstudiandoManualAux(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput)
+
+def generarEstudiandoManualAux(nombreManual, apellido1Manual, apellido2Manual, generoInput, partesNombre, annoInput):
+    if generoInput != 1 or 2:
+        print("El valor ingresado es invalido. Digite de nuevo.")
+        return generarEstudianteManualES()
+    if len(partesNombre) != 3:
+        print("El formato del nombre es erroneo. Debe tener 3 palabras, un nombre y dos apellidos. Digite el nombre de nuevo.")
+        return generarEstudianteManualES()
+    if len(annoInput) != 4 or annoInput != int:
+        print("El año ingresado es invalido, digitelo de nuevo.")
+        return generarEstudianteManualES()
+    return generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput)
+
+def generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput, porcentaje1, porcentaje2, porcentaje3): #Probar si llamandola en crearBaseES se une bien
+    nuevoEstudiante= []
+    notas= []
+    nombreTupla = (nombreManual, apellido1Manual, apellido2Manual)
+    generoCreado = True if generoInput == 1 else False
+    correoManual = generarCorreo(nombreManual, apellido1Manual)
+    carnet = crearCarnet(annoInput, annoInput)
+    crearNotas = notasRandom(porcentaje1, porcentaje2, porcentaje3)
+    notas.append(crearNotas)
+    estuadianteManual= [nombreTupla, generoCreado, correoManual, carnet, notas]
+    nuevoEstudiante.append(nombreTupla, generoCreado, correoManual, carnet, notas)
+    print(notas)
+    
+
 
 
 #def enviarCorreo()
 
-#def sortearPorGenero       
+#def sortearPorGenero  
+
+#def ordenarPorGenero(baseFinal):     
 
 
+#generarEstudianteManualES()
 #generarListaTXT()
 #crearBaseTXT()
 #print(generarNombre())
 #print(crearCarnet(2022,2025))
 #print(generarCorreo("Marciano", "Cantero"))
 #print(porcentajesNotas())
-crearBaseEs()
-#crearBaseTXT([],[],2022,2025,(40,40,20))
+#crearBaseEs()
+# crearBaseTXT([],[],2022,2025,(40,40,20))
+generarEstudianteManual("Pepe", "Marciano","Espinoza", 1, 1, 35, 35, 30)
 
