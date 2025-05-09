@@ -48,29 +48,28 @@ def crearCarnet(annoInicial, annoFinal):
     Devuelve:
     - carnet (int): Número de carnet si cumple el formato esperado.
     """
+    patron =  r"^[123456789+$]"
     sedes = []
-    with open('sedes.txt', 'r', encoding='utf-8') as archivo:
+    with open('sedes.txt', 'r') as archivo:
         for linea in archivo:
-            sedes.append(linea.rstrip('\n'))
+            sedes.append(linea.rstrip('\n')) #Lee linea por linea y lo añade a la lista vacia
 
-    codigoSede = random.randint(1, len(sedes))  # Número entre 1 y total de sedes
+    codigoSede = random.randint(1, len(sedes))  # Genera un código entre 1 y la cantidad de sedes en el archivo
     inicioCarnet = random.randint(annoInicial, annoFinal)
-    if len(sedes) < 10:
-        codigoSede = "0" + str(codigoSede)
+    if len(sedes)<10:
+        codigoSede = "0"+str(codigoSede)
     else:
-        codigoSede = str(codigoSede).zfill(2)
+        codigoSede = str(codigoSede)
     finalCarnet = random.randint(1000, 9999)
-
-    carnetStr = f"{inicioCarnet}{codigoSede}{finalCarnet}"
-
-    if re.fullmatch(r"\d{10}", carnetStr):
-        return int(carnetStr)
+    carnet = int(str(inicioCarnet)+str(codigoSede)+ str(finalCarnet))  #Los une 
+    if not re.fullmatch(patron, carnet):
+        return carnet
     else:
-        raise ValueError("El carnet generado no cumple con el formato esperado.")
+        return crearCarnet(annoInicial, annoFinal)
 
 #Correo
 def generarCorreo(nombre, apellido1):
-    patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" #Solo acepta letras, acepta caracteres especiales
+    patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" #Solo acepta letras y caracteres especiales
 
     if not re.fullmatch(patron, nombre) or not re.fullmatch(patron, apellido1): #Revisa que el nombre y apellido tengan el patron esperado
         raise ValueError("El nombre y el primer apellido deben contener solo letras sin espacios ni caracteres especiales.")
@@ -234,25 +233,25 @@ def generarEstudiandoManualAux(nombreManual, apellido1Manual, apellido2Manual, g
         return generarEstudianteManualES()
     return generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput)
 
-def generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput, porcentaje1, porcentaje2, porcentaje3): #Probar si llamandola en crearBaseES se une bien
-    nuevoEstudiante= []
-    notas= []
+def generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, generoInput, annoInput, porcentaje1, porcentaje2, porcentaje3, baseFinal): #Probar si llamandola en crearBaseES se une bien
+    #nuevoEstudiante= []
     nombreTupla = (nombreManual, apellido1Manual, apellido2Manual)
     generoCreado = True if generoInput == 1 else False
     correoManual = generarCorreo(nombreManual, apellido1Manual)
     carnet = crearCarnet(annoInput, annoInput)
-    crearNotas = notasRandom(porcentaje1, porcentaje2, porcentaje3)
-    notas.append(crearNotas)
+    notas = notasRandom(porcentaje1, porcentaje2, porcentaje3)
     estuadianteManual= [nombreTupla, generoCreado, correoManual, carnet, notas]
-    nuevoEstudiante.append(nombreTupla, generoCreado, correoManual, carnet, notas)
-    print(notas)
+    #nuevoEstudiante.append(estuadianteManual)
+    baseFinal.append(estuadianteManual)
+    print(baseFinal)
+    
     
 
 
 
 #def enviarCorreo()
 
-#def sortearPorGenero  
+#def sortearPorNota
 
 #def ordenarPorGenero(baseFinal):     
 
@@ -266,5 +265,5 @@ def generarEstudianteManual(nombreManual, apellido1Manual, apellido2Manual, gene
 #print(porcentajesNotas())
 #crearBaseEs()
 # crearBaseTXT([],[],2022,2025,(40,40,20))
-generarEstudianteManual("Pepe", "Marciano","Espinoza", 1, 1, 35, 35, 30)
+generarEstudianteManual("Pepe", "Marciano","Espinoza", 1, 2022, 35, 35, 30, [])
 

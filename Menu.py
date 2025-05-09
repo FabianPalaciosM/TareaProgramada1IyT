@@ -1,7 +1,7 @@
 import Funciones
 
-def menu():
-    BDCreada=False
+BDCreada=False
+def menu(BDCreada):
     while True:
         print("1. Crear BD dinamica\n"
         "2. Registrar un estudiante\n"
